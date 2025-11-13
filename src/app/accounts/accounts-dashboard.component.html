@@ -1,0 +1,167 @@
+<main class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <p class="eyebrow">Digital Banking</p>
+      <h1>Gestion des comptes</h1>
+      <p class="subtitle">Consultez vos comptes et enregistrez de nouvelles opérations temps réel.</p>
+    </div>
+
+    <div class="health-card" [class.health-card--offline]="!healthStatus()">
+      <div>
+        <p class="eyebrow">Backend</p>
+        <strong>
+          {{ (healthStatus()?.status | titlecase) || 'Indisponible' }}
+        </strong>
+        <p class="health-timestamp" *ngIf="healthStatus() as health">
+          {{ health.timestamp | date: 'short' }}
+        </p>
+      </div>
+      <button type="button" class="ghost" (click)="refreshAll()">Actualiser</button>
+    </div>
+  </header>
+
+  <section class="dashboard__content">
+    <aside class="card accounts-card">
+      <div class="card__header">
+        <div>
+          <h2>Comptes bancaires</h2>
+          <p class="card__hint">Connectés sur http://localhost:4000</p>
+        </div>
+        <button type="button" class="ghost" (click)="reloadAccounts()">Recharger</button>
+      </div>
+
+      <div class="status" *ngIf="loadingAccounts()">Chargement des comptes...</div>
+      <div class="status status--error" *ngIf="!loadingAccounts() && errorMessage()">
+        {{ errorMessage() }}
+      </div>
+
+      <ul class="accounts-list" *ngIf="accounts().length; else noAccounts">
+        <li *ngFor="let account of accounts(); trackBy: trackAccount">
+          <button
+            type="button"
+            class="account-item"
+            (click)="selectAccount(account.id)"
+            [ngClass]="{ 'account-item--active': selectedAccount()?.id === account.id }"
+          >
+            <span class="account-item__id">{{ account.id }}</span>
+            <span class="account-item__holder">{{ account.holder }}</span>
+            <span class="account-item__balance">
+              {{ account.balance | currency: account.currency }}
+            </span>
+          </button>
+        </li>
+      </ul>
+
+      <ng-template #noAccounts>
+        <div class="status">Aucun compte disponible pour le moment.</div>
+      </ng-template>
+    </aside>
+
+    <section class="card details-card" *ngIf="selectedAccount() as account; else noSelection">
+      <div class="card__header">
+        <div>
+          <p class="eyebrow">Compte sélectionné</p>
+          <h2>{{ account.holder }}</h2>
+        </div>
+        <span class="badge">{{ account.currency }}</span>
+      </div>
+
+      <div class="account-summary">
+        <div>
+          <p class="eyebrow">Solde actuel</p>
+          <strong class="amount">{{ account.balance | currency: account.currency }}</strong>
+        </div>
+        <div>
+          <p class="eyebrow">Identifiant</p>
+          <strong>{{ account.id }}</strong>
+        </div>
+        <div *ngIf="account.iban">
+          <p class="eyebrow">IBAN</p>
+          <strong>{{ account.iban }}</strong>
+        </div>
+      </div>
+
+      <section class="transactions">
+        <header>
+          <h3>Historique des transactions</h3>
+          <div class="status status--inline" *ngIf="loadingAccountDetails()">Mise à jour...</div>
+        </header>
+
+        <div *ngIf="account.transactions?.length; else noTransactions">
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Libellé</th>
+                <th>Montant</th>
+                <th>Horodatage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let transaction of account.transactions">
+                <td>
+                  <span class="pill" [ngClass]="transaction.type">
+                    {{ transaction.type | titlecase }}
+                  </span>
+                </td>
+                <td>{{ transaction.label || '—' }}</td>
+                <td>
+                  {{ transaction.amount | currency: account.currency }}
+                </td>
+                <td>
+                  {{ transaction.timestamp ? (transaction.timestamp | date: 'short') : '—' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ng-template #noTransactions>
+          <div class="status">Aucune transaction enregistrée.</div>
+        </ng-template>
+      </section>
+
+      <section class="transaction-form">
+        <h3>Nouvelle transaction</h3>
+
+        <form [formGroup]="transactionForm" (ngSubmit)="submitTransaction()">
+          <div class="form-grid">
+            <label>
+              Type
+              <select formControlName="type">
+                <option value="credit">Crédit</option>
+                <option value="debit">Débit</option>
+              </select>
+            </label>
+
+            <label>
+              Montant
+              <input type="number" step="0.01" min="0.01" formControlName="amount" placeholder="0,00" />
+            </label>
+
+            <label>
+              Libellé
+              <input type="text" formControlName="label" placeholder="ex: Virement salaire" />
+            </label>
+          </div>
+
+          <div class="form-footer">
+            <button type="submit" [disabled]="disableSubmit()">Enregistrer</button>
+            <span class="status status--success" *ngIf="transactionFeedback()?.type === 'success'">
+              {{ transactionFeedback()?.message }}
+            </span>
+            <span class="status status--error" *ngIf="transactionFeedback()?.type === 'error'">
+              {{ transactionFeedback()?.message }}
+            </span>
+          </div>
+        </form>
+      </section>
+    </section>
+
+    <ng-template #noSelection>
+      <section class="card details-card">
+        <div class="status">Sélectionnez un compte pour afficher les détails.</div>
+      </section>
+    </ng-template>
+  </section>
+</main>
