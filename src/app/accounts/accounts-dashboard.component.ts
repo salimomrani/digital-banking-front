@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf, TitleCasePipe } from '@angular/common';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
@@ -36,10 +36,6 @@ export class AccountsDashboardComponent {
     }),
     label: this.fb.control('', { validators: [Validators.maxLength(80)] })
   });
-
-  protected readonly disableSubmit = computed(
-    () => this.transactionForm.invalid || !this.selectedAccount() || this.submittingTransaction()
-  );
 
   constructor() {
     this.loadHealth();
@@ -159,5 +155,9 @@ export class AccountsDashboardComponent {
           this.errorMessage.set(error.message ?? 'Impossible de charger le compte.');
         }
       });
+  }
+
+  protected disableSubmit() {
+    return this.transactionForm.invalid || !this.selectedAccount() || this.submittingTransaction();
   }
 }
