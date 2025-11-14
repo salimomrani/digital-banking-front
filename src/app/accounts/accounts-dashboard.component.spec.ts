@@ -6,7 +6,7 @@ import { AccountsService } from './accounts.service';
 describe('AccountsDashboardComponent', () => {
   let fixture: ComponentFixture<AccountsDashboardComponent>;
   let component: AccountsDashboardComponent;
-  let accountsService: jasmine.SpyObj<AccountsService>;
+  let accountsService: jest.Mocked<AccountsService>;
 
   const accountSummary = {
     id: 'ACC-0001',
@@ -31,23 +31,23 @@ describe('AccountsDashboardComponent', () => {
   };
 
   beforeEach(async () => {
-    accountsService = jasmine.createSpyObj('AccountsService', [
-      'getHealth',
-      'getAccounts',
-      'getAccount',
-      'createTransaction'
-    ]);
+    accountsService = {
+      getHealth: jest.fn(),
+      getAccounts: jest.fn(),
+      getAccount: jest.fn(),
+      createTransaction: jest.fn()
+    } as jest.Mocked<AccountsService>;
 
-    accountsService.getHealth.and.returnValue(
+    accountsService.getHealth.mockReturnValue(
       of({
         status: 'ok',
         service: 'api',
         timestamp: '2024-01-01T00:00:00Z'
       })
     );
-    accountsService.getAccounts.and.returnValue(of([accountSummary]));
-    accountsService.getAccount.and.returnValue(of(accountDetails));
-    accountsService.createTransaction.and.returnValue(
+    accountsService.getAccounts.mockReturnValue(of([accountSummary]));
+    accountsService.getAccount.mockReturnValue(of(accountDetails));
+    accountsService.createTransaction.mockReturnValue(
       of({
         message: 'Transaction enregistrée',
         account: { id: 'ACC-0001', balance: 1300, currency: 'EUR' },
