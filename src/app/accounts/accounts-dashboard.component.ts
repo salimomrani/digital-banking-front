@@ -10,8 +10,7 @@ import { AccountsService } from './accounts.service';
   selector: 'app-accounts-dashboard',
   standalone: true,
   imports: [NgClass, ReactiveFormsModule, CurrencyPipe, DatePipe, TitleCasePipe],
-  templateUrl: './accounts-dashboard.component.html',
-  styleUrl: './accounts-dashboard.component.scss'
+  templateUrl: './accounts-dashboard.component.html'
 })
 export class AccountsDashboardComponent {
   private readonly accountsService = inject(AccountsService);
