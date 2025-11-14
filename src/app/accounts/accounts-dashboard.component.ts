@@ -1,4 +1,4 @@
-import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf, TitleCasePipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass, TitleCasePipe } from '@angular/common';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -9,7 +9,7 @@ import { AccountsService } from './accounts.service';
 @Component({
   selector: 'app-accounts-dashboard',
   standalone: true,
-  imports: [NgIf, NgFor, NgClass, ReactiveFormsModule, CurrencyPipe, DatePipe, TitleCasePipe],
+  imports: [NgClass, ReactiveFormsModule, CurrencyPipe, DatePipe, TitleCasePipe],
   templateUrl: './accounts-dashboard.component.html',
   styleUrl: './accounts-dashboard.component.css'
 })
