@@ -2,7 +2,7 @@
 
 ## Phase 1 — Setup du projet
 - [x] Initialiser Angular
-- [ ] Ajouter TailwindCSS
+- [x] Ajouter TailwindCSS
 - [x] Routing de base
 - [ ] Layout (header + sidebar)
 - [ ] AuthInterceptor (tokens)
@@ -23,6 +23,7 @@
 - [x] Affichage détails (solde, devise)
 - [x] Afficher IBAN
 - [x] États loading/empty/error
+- [x] Responsive mobile/tablette
 - [ ] Rafraîchissement automatique
 - [ ] Animations Tailwind
 
