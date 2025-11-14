@@ -3,13 +3,14 @@ import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { Account, GenerateAccountsPayload, HealthStatus } from './accounts.types';
+import { RouterLink } from '@angular/router';
+import { Account, HealthStatus } from './accounts.types';
 import { AccountsService } from './accounts.service';
 
 @Component({
   selector: 'app-accounts-dashboard',
   standalone: true,
-  imports: [NgClass, ReactiveFormsModule, CurrencyPipe, DatePipe, TitleCasePipe],
+  imports: [NgClass, ReactiveFormsModule, CurrencyPipe, DatePipe, TitleCasePipe, RouterLink],
   templateUrl: './accounts-dashboard.component.html'
 })
 export class AccountsDashboardComponent {
@@ -24,11 +25,9 @@ export class AccountsDashboardComponent {
   protected readonly loadingAccounts = signal(false);
   protected readonly loadingAccountDetails = signal(false);
   protected readonly submittingTransaction = signal(false);
-  protected readonly generatingAccounts = signal(false);
 
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly transactionFeedback = signal<{ type: 'success' | 'error'; message: string } | null>(null);
-  protected readonly generationFeedback = signal<{ type: 'success' | 'error'; message: string } | null>(null);
 
   protected readonly transactionForm = this.fb.group({
     type: this.fb.nonNullable.control<'credit' | 'debit'>('credit'),
@@ -36,13 +35,6 @@ export class AccountsDashboardComponent {
       validators: [Validators.required, Validators.min(0.01)]
     }),
     label: this.fb.control('', { validators: [Validators.maxLength(80)] })
-  });
-
-  protected readonly generateAccountsForm = this.fb.group({
-    count: this.fb.nonNullable.control(1, {
-      validators: [Validators.required, Validators.min(1), Validators.max(50)]
-    }),
-    userId: this.fb.control<number | null>(null, { validators: [Validators.min(1)] })
   });
 
   constructor() {
@@ -109,52 +101,6 @@ export class AccountsDashboardComponent {
       });
   }
 
-  protected generateAccounts() {
-    if (this.generateAccountsForm.invalid) {
-      this.generateAccountsForm.markAllAsTouched();
-      return;
-    }
-
-    if (this.generatingAccounts()) {
-      return;
-    }
-
-    const { count, userId } = this.generateAccountsForm.getRawValue();
-    if (!count) {
-      return;
-    }
-
-    const payload: GenerateAccountsPayload = { count };
-    if (userId) {
-      payload.userId = userId;
-    }
-
-    this.generationFeedback.set(null);
-    this.generatingAccounts.set(true);
-    this.accountsService
-      .generateAccounts(payload)
-      .pipe(
-        finalize(() => this.generatingAccounts.set(false)),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe({
-        next: (response) => {
-          this.generateAccountsForm.patchValue({ count: 1 });
-          this.generationFeedback.set({
-            type: 'success',
-            message: response.message || 'Comptes générés.'
-          });
-          this.loadAccounts();
-        },
-        error: (error: Error) => {
-          this.generationFeedback.set({
-            type: 'error',
-            message: error.message ?? 'Impossible de générer des comptes.'
-          });
-        }
-      });
-  }
-
   private loadHealth() {
     this.accountsService
       .getHealth()
@@ -215,7 +161,4 @@ export class AccountsDashboardComponent {
     return this.transactionForm.invalid || !this.selectedAccount() || this.submittingTransaction();
   }
 
-  protected disableGenerateAccounts() {
-    return this.generateAccountsForm.invalid || this.generatingAccounts();
-  }
 }

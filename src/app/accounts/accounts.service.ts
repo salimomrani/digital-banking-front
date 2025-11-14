@@ -8,6 +8,14 @@ import {
   HealthStatus,
   GenerateAccountsPayload,
   GenerateAccountsResponse,
+  GenerateTransactionsPayload,
+  GenerateTransactionsResponse,
+  TransferPayload,
+  TransferResponse,
+  CreateCardPayload,
+  CreateCardResponse,
+  CreateLoanPayload,
+  CreateLoanResponse,
   NewTransactionPayload,
   TransactionResponse
 } from './accounts.types';
@@ -47,5 +55,24 @@ export class AccountsService {
       `${this.apiBaseUrl}/api/bank/generate-accounts`,
       payload
     );
+  }
+
+  generateTransactions(payload: GenerateTransactionsPayload) {
+    return this.http.post<GenerateTransactionsResponse>(
+      `${this.apiBaseUrl}/api/bank/generate-transactions`,
+      payload
+    );
+  }
+
+  transferFunds(payload: TransferPayload) {
+    return this.http.post<TransferResponse>(`${this.apiBaseUrl}/api/bank/transfers`, payload);
+  }
+
+  createCard(payload: CreateCardPayload) {
+    return this.http.post<CreateCardResponse>(`${this.apiBaseUrl}/api/bank/cards`, payload);
+  }
+
+  createLoan(payload: CreateLoanPayload) {
+    return this.http.post<CreateLoanResponse>(`${this.apiBaseUrl}/api/bank/loans`, payload);
   }
 }

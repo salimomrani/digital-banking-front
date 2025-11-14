@@ -115,4 +115,66 @@ describe('AccountsService', () => {
     expect(req.request.body).toEqual({ count: 2 });
     req.flush(mockResponse);
   });
+
+  it('should call the generate transactions endpoint', () => {
+    service.generateTransactions({ count: 5, accountId: 3 }).subscribe();
+
+    const req = httpMock.expectOne('http://localhost:4000/api/bank/generate-transactions');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ count: 5, accountId: 3 });
+    req.flush({ message: 'ok', data: [] });
+  });
+
+  it('should post transfer payloads to the API', () => {
+    service
+      .transferFunds({
+        fromAccountId: 1,
+        toAccountId: 2,
+        amount: 250,
+        transferType: 'instant'
+      })
+      .subscribe();
+
+    const req = httpMock.expectOne('http://localhost:4000/api/bank/transfers');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({
+      fromAccountId: 1,
+      toAccountId: 2,
+      amount: 250,
+      transferType: 'instant'
+    });
+    req.flush({ message: 'Transfer completed successfully', data: { success: true } });
+  });
+
+  it('should call the cards endpoint', () => {
+    service.createCard({ accountId: 4, cardType: 'debit' }).subscribe();
+
+    const req = httpMock.expectOne('http://localhost:4000/api/bank/cards');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ accountId: 4, cardType: 'debit' });
+    req.flush({ message: 'Card created successfully', data: {} });
+  });
+
+  it('should call the loans endpoint', () => {
+    service
+      .createLoan({
+        accountId: 4,
+        loanType: 'personal',
+        amount: 10000,
+        interestRate: 4.5,
+        durationMonths: 36
+      })
+      .subscribe();
+
+    const req = httpMock.expectOne('http://localhost:4000/api/bank/loans');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({
+      accountId: 4,
+      loanType: 'personal',
+      amount: 10000,
+      interestRate: 4.5,
+      durationMonths: 36
+    });
+    req.flush({ message: 'Loan created successfully', data: {} });
+  });
 });
