@@ -11,7 +11,7 @@ Source lives under `src/`, with bootstrap files in `main.ts` and routing config 
 Always run `npm install` after pulling dependencies or switching Node versions.
 
 ## Coding Style & Naming Conventions
-Use the workspace TypeScript config plus Prettier (`printWidth: 100`, single quotes, Angular HTML parser) to format code—run `npx prettier --write src/**/*.ts`. Keep indentation at two spaces. Name Angular classes in PascalCase (`DashboardComponent`) and files in kebab-case (`dashboard.component.ts`). Prefer standalone components and provide strong typing for all inputs/outputs. Keep CSS selectors scoped with the component host to avoid leaking styles.
+Use the workspace TypeScript config plus Prettier (`printWidth: 100`, single quotes, Angular HTML parser) to format code—run `npx prettier --write src/**/*.ts`. Keep indentation at two spaces. Name Angular classes in PascalCase (`DashboardComponent`) and files in kebab-case (`dashboard.component.ts`). Prefer standalone components and provide strong typing for all inputs/outputs. In templates, always use Angular's new control flow syntax (`@if`, `@for`, `@switch`) instead of the legacy structural directives. Keep CSS selectors scoped with the component host to avoid leaking styles.
 
 ## Testing Guidelines
 Write Jasmine specs beside each feature (`feature.component.spec.ts`). Favor shallow component tests for UI logic and service tests for pure functions. Mock HTTP/Router dependencies via Angular TestBed providers. Require new features to include tests ensuring at least the previous coverage percentage; fail PR review if `npm test -- --watch=false` does not pass.
