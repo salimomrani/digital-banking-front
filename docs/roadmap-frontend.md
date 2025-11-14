@@ -4,7 +4,7 @@
 - [x] Initialiser Angular
 - [x] Ajouter TailwindCSS
 - [x] Routing de base
-- [ ] Layout (header + sidebar)
+- [x] Layout (header + sidebar)
 - [ ] AuthInterceptor (tokens)
 - [ ] Guards (routes protégées)
 - [ ] Login page
@@ -24,18 +24,20 @@
 - [x] Afficher IBAN
 - [x] États loading/empty/error
 - [x] Génération comptes fictifs
+- [x] Génération transactions fictives
 - [x] Responsive mobile/tablette
 - [ ] Rafraîchissement automatique
 - [ ] Animations Tailwind
 
 ## Phase 4 — Transactions
 - [x] Formulaire ReactiveForms
-- [ ] Dépôt / retrait / transfert
+- [x] Dépôt / retrait / transfert
 - [x] Validations en temps réel
 - [ ] Toasts success/error
 - [ ] Pagination ou infinite scroll
 - [ ] Filtres (date, type, montant)
 - [ ] Relevés PDF/CSV
+- [x] Intégration cartes/prêts (API bank)
 
 ## Phase 5 — Profil & Sécurité
 - [ ] Page profil

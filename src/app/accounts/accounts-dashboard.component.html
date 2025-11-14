@@ -1,5 +1,7 @@
 <main class="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6 lg:px-12">
-  <header class="mx-auto flex w-full max-w-5xl flex-col gap-4 rounded-2xl bg-white p-6 shadow-lg lg:flex-row lg:items-center lg:justify-between">
+  <header
+    class="mx-auto flex w-full max-w-5xl flex-col gap-4 rounded-2xl bg-white p-6 shadow-lg lg:flex-row lg:items-center lg:justify-between"
+  >
     <div class="space-y-1">
       <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Digital Banking</p>
       <h1 class="text-2xl font-semibold">Gestion des comptes</h1>
@@ -8,24 +10,33 @@
       </p>
     </div>
 
-    <div
-      class="flex w-full flex-col gap-3 rounded-xl border border-slate-100 bg-slate-900/90 p-4 text-white shadow-md lg:w-auto lg:min-w-[260px] lg:flex-row lg:items-center"
-      [class.bg-rose-900/90]="!healthStatus()"
-    >
-      <div class="flex-1 space-y-1">
-        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Backend</p>
-        <strong class="text-lg font-semibold">
-          {{ (healthStatus()?.status | titlecase) || 'Indisponible' }}
-        </strong>
-        @if (healthStatus(); as health) {
-          <p class="text-xs text-slate-300">
-            {{ health.timestamp | date: 'short' }}
-          </p>
-        }
-      </div>
-      <button type="button" class="rounded-lg border border-white/40 px-3 py-2 text-sm font-medium" (click)="refreshAll()">
-        Actualiser
+    <div class="flex flex-col gap-3 text-sm sm:flex-row sm:items-center">
+      <button
+        type="button"
+        class="rounded-lg border border-slate-200 px-4 py-2 font-semibold text-indigo-600"
+        routerLink="/operations"
+      >
+        Ouvrir les opérations
       </button>
+      <div
+        class="flex flex-1 items-center justify-between rounded-xl border border-slate-100 bg-slate-900/90 px-4 py-3 text-white shadow-md sm:flex-none sm:min-w-[240px]"
+        [class.bg-rose-900/90]="!healthStatus()"
+      >
+        <div class="space-y-1">
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Backend</p>
+          <strong class="text-lg font-semibold">
+            {{ (healthStatus()?.status | titlecase) || 'Indisponible' }}
+          </strong>
+          @if (healthStatus(); as health) {
+            <p class="text-xs text-slate-300">
+              {{ health.timestamp | date: 'short' }}
+            </p>
+          }
+        </div>
+        <button type="button" class="rounded-lg border border-white/40 px-3 py-2 text-xs font-semibold" (click)="refreshAll()">
+          Actualiser
+        </button>
+      </div>
     </div>
   </header>
 
@@ -41,66 +52,6 @@
         </button>
       </div>
 
-      <form
-        class="mb-4 space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-4"
-        [formGroup]="generateAccountsForm"
-        (ngSubmit)="generateAccounts()"
-      >
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p class="text-sm font-semibold text-slate-700">Générer des comptes fictifs</p>
-            <p class="text-xs text-slate-500">Entre 1 et 50 comptes par requête</p>
-          </div>
-          <button
-            type="submit"
-            class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-            [disabled]="disableGenerateAccounts()"
-          >
-            @if (generatingAccounts()) {
-              <span>Generation...</span>
-            } @else {
-              <span>Générer</span>
-            }
-          </button>
-        </div>
-        <div class="grid gap-3 sm:grid-cols-2">
-          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Nombre de comptes
-            <input
-              type="number"
-              min="1"
-              max="50"
-              formControlName="count"
-              class="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            />
-          </label>
-          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            ID utilisateur (optionnel)
-            <input
-              type="number"
-              min="1"
-              formControlName="userId"
-              placeholder="ex: 42"
-              class="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-            />
-          </label>
-        </div>
-        @if (generateAccountsForm.get('count')?.invalid && generateAccountsForm.get('count')?.touched) {
-          <p class="text-sm text-rose-600">Choisissez un nombre entre 1 et 50.</p>
-        }
-        @if (generationFeedback()) {
-          <p
-            class="text-sm font-medium"
-            [ngClass]="{
-              'text-emerald-600': generationFeedback()?.type === 'success',
-              'text-rose-600': generationFeedback()?.type === 'error'
-            }"
-          >
-            {{ generationFeedback()?.message }}
-          </p>
-        }
-      </form>
-
       @if (loadingAccounts()) {
         <div class="text-sm text-slate-500">Chargement des comptes...</div>
       }
@@ -109,6 +60,11 @@
           {{ errorMessage() }}
         </div>
       }
+
+      <div class="mb-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-500">
+        Besoin de générer des données ou d’exécuter un virement ? Rendez-vous dans l’onglet
+        <a routerLink="/operations" class="font-semibold text-indigo-600 underline">Opérations</a>.
+      </div>
 
       @if (accounts().length) {
         <ul class="flex flex-col gap-3">

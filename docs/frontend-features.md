@@ -4,6 +4,9 @@
 - **Carte santé backend** : ping `/health`, affichage status + timestamp + bouton d'actualisation.
 - **Liste des comptes** : chargement via `/api/accounts`, sélection automatique du premier compte, états `chargement`, `erreur` et `vide`.
 - **Génération de comptes** : formulaire admin dans la sidebar pour déclencher `POST /api/bank/generate-accounts` (1 à 50 comptes).
+- **Génération de transactions** : deuxième formulaire pour cibler un compte (`POST /api/bank/generate-transactions`) et simuler 1-100 opérations.
+- **Opérations bancaires** : formulaires dédiés pour `POST /api/bank/transfers`, `/cards` et `/loans` avec retours inline (succès/erreur) et rechargement des données.
+- **Routing dédié** : la route `/accounts` sert la consultation, tandis que `/operations` concentre ces formulaires admin pour garder le dashboard léger.
 - **Détails du compte** : solde, devise, IBAN conditionnel, badge devise, rafraîchissement lors de la sélection.
 - **Transactions** : tableau trié par ordre d'arrivée, feedback lorsqu'il n'y a pas d'opérations.
 - **Formulaire de transaction** : Reactive Forms, validation min 0.01 €, reset après succès, messages inline (`success` / `error`).

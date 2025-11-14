@@ -1,0 +1,362 @@
+<main class="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 sm:px-6 lg:px-12">
+  <header class="mx-auto flex w-full max-w-5xl flex-col gap-3 rounded-2xl bg-white p-6 shadow-lg">
+    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Admin tools</p>
+    <h1 class="text-2xl font-semibold text-slate-900">Opérations bancaires simulées</h1>
+    <p class="text-sm text-slate-500">
+      Déclenchez les endpoints `/api/bank` pour alimenter votre sandbox (comptes, transactions, virements, cartes, prêts).
+    </p>
+  </header>
+
+  <div class="mx-auto mt-6 grid w-full max-w-5xl gap-6 lg:grid-cols-2">
+    <section class="space-y-4 rounded-2xl bg-white p-5 shadow-lg">
+      <h2 class="text-lg font-semibold text-slate-900">Génération de données</h2>
+
+      <form
+        class="space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-4"
+        [formGroup]="generateAccountsForm"
+        (ngSubmit)="generateAccounts()"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Comptes fictifs</h3>
+            <p class="text-xs text-slate-500">POST /api/bank/generate-accounts (1-50 comptes)</p>
+          </div>
+          <button
+            type="submit"
+            class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="disableGenerateAccounts()"
+          >
+            @if (generatingAccounts()) {
+              <span>Generation...</span>
+            } @else {
+              <span>Créer</span>
+            }
+          </button>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Nombre
+            <input
+              type="number"
+              min="1"
+              max="50"
+              formControlName="count"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            ID utilisateur (optionnel)
+            <input
+              type="number"
+              min="1"
+              formControlName="userId"
+              placeholder="ex: 42"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+        </div>
+        @if (generationFeedback()) {
+          <p
+            class="text-sm font-medium"
+            [ngClass]="{
+              'text-emerald-600': generationFeedback()?.type === 'success',
+              'text-rose-600': generationFeedback()?.type === 'error'
+            }"
+          >
+            {{ generationFeedback()?.message }}
+          </p>
+        }
+      </form>
+
+      <form
+        class="space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-4"
+        [formGroup]="generateTransactionsForm"
+        (ngSubmit)="generateTransactions()"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Transactions aléatoires</h3>
+            <p class="text-xs text-slate-500">POST /api/bank/generate-transactions (1-100 opérations)</p>
+          </div>
+          <button
+            type="submit"
+            class="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="disableGenerateTransactions()"
+          >
+            @if (generatingTransactions()) {
+              <span>Generation...</span>
+            } @else {
+              <span>Créer</span>
+            }
+          </button>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Nombre d'opérations
+            <input
+              type="number"
+              min="1"
+              max="100"
+              formControlName="count"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            ID du compte
+            <input
+              type="number"
+              min="1"
+              formControlName="accountId"
+              placeholder="ex: 12"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+        </div>
+        @if (transactionsGenerationFeedback()) {
+          <p
+            class="text-sm font-medium"
+            [ngClass]="{
+              'text-emerald-600': transactionsGenerationFeedback()?.type === 'success',
+              'text-rose-600': transactionsGenerationFeedback()?.type === 'error'
+            }"
+          >
+            {{ transactionsGenerationFeedback()?.message }}
+          </p>
+        }
+      </form>
+    </section>
+
+    <section class="space-y-4 rounded-2xl bg-white p-5 shadow-lg">
+      <h2 class="text-lg font-semibold text-slate-900">Virements</h2>
+
+      <form class="space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-4" [formGroup]="transferForm" (ngSubmit)="submitTransfer()">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Effectuer un virement</h3>
+            <p class="text-xs text-slate-500">POST /api/bank/transfers</p>
+          </div>
+          <span class="text-xs font-semibold uppercase text-slate-400">atomique</span>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+            Compte émetteur
+            <input
+              type="number"
+              min="1"
+              formControlName="fromAccountId"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+            Compte destinataire
+            <input
+              type="number"
+              min="1"
+              formControlName="toAccountId"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+            Montant
+            <input
+              type="number"
+              min="1"
+              formControlName="amount"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+            Type de virement
+            <select
+              formControlName="transferType"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            >
+              <option value="sepa">SEPA</option>
+              <option value="instant">Instantané</option>
+              <option value="international">International</option>
+            </select>
+          </label>
+        </div>
+        <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+          Description
+          <input
+            type="text"
+            formControlName="description"
+            placeholder="Remboursement..."
+            class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          />
+        </label>
+        <div class="space-y-2">
+          <button
+            type="submit"
+            class="w-full rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="disableTransfer()"
+          >
+            Lancer le virement
+          </button>
+          @if (transferFeedback()) {
+            <p
+              class="text-sm font-medium"
+              [ngClass]="{
+                'text-emerald-600': transferFeedback()?.type === 'success',
+                'text-rose-600': transferFeedback()?.type === 'error'
+              }"
+            >
+              {{ transferFeedback()?.message }}
+            </p>
+          }
+        </div>
+      </form>
+    </section>
+
+    <section class="space-y-4 rounded-2xl bg-white p-5 shadow-lg">
+      <h2 class="text-lg font-semibold text-slate-900">Cartes bancaires</h2>
+
+      <form class="space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-4" [formGroup]="cardForm" (ngSubmit)="submitCardCreation()">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Créer une carte</h3>
+            <p class="text-xs text-slate-500">POST /api/bank/cards</p>
+          </div>
+          <span class="text-xs font-semibold uppercase text-slate-400">Visa fictive</span>
+        </div>
+        <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+          ID compte
+          <input
+            type="number"
+            min="1"
+            formControlName="accountId"
+            class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          />
+        </label>
+        <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+          Type de carte
+          <select
+            formControlName="cardType"
+            class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          >
+            <option value="debit">Débit</option>
+            <option value="credit">Crédit</option>
+            <option value="virtual">Virtuelle</option>
+          </select>
+        </label>
+        <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+          Limite (crédit uniquement)
+          <input
+            type="number"
+            min="1"
+            formControlName="limit"
+            placeholder="5000"
+            class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          />
+        </label>
+        <div class="space-y-2">
+          <button
+            type="submit"
+            class="w-full rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="disableCardCreation()"
+          >
+            Créer la carte
+          </button>
+          @if (cardFeedback()) {
+            <p
+              class="text-sm font-medium"
+              [ngClass]="{
+                'text-emerald-600': cardFeedback()?.type === 'success',
+                'text-rose-600': cardFeedback()?.type === 'error'
+              }"
+            >
+              {{ cardFeedback()?.message }}
+            </p>
+          }
+        </div>
+      </form>
+    </section>
+
+    <section class="space-y-4 rounded-2xl bg-white p-5 shadow-lg">
+      <h2 class="text-lg font-semibold text-slate-900">Prêts bancaires</h2>
+
+      <form class="space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-4" [formGroup]="loanForm" (ngSubmit)="submitLoanCreation()">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Créer un prêt</h3>
+            <p class="text-xs text-slate-500">POST /api/bank/loans</p>
+          </div>
+          <span class="text-xs font-semibold uppercase text-slate-400">Mensualités auto</span>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+            ID compte
+            <input
+              type="number"
+              min="1"
+              formControlName="accountId"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+            Type de prêt
+            <select
+              formControlName="loanType"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            >
+              <option value="personal">Personnel</option>
+              <option value="mortgage">Immobilier</option>
+              <option value="auto">Auto</option>
+            </select>
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+            Montant
+            <input
+              type="number"
+              min="1"
+              formControlName="amount"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500">
+            Taux (%) - max 20
+            <input
+              type="number"
+              min="0"
+              max="20"
+              step="0.1"
+              formControlName="interestRate"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase text-slate-500 sm:col-span-2">
+            Durée (mois)
+            <input
+              type="number"
+              min="6"
+              max="360"
+              formControlName="durationMonths"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+        </div>
+        <div class="space-y-2">
+          <button
+            type="submit"
+            class="w-full rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="disableLoanCreation()"
+          >
+            Créer le prêt
+          </button>
+          @if (loanFeedback()) {
+            <p
+              class="text-sm font-medium"
+              [ngClass]="{
+                'text-emerald-600': loanFeedback()?.type === 'success',
+                'text-rose-600': loanFeedback()?.type === 'error'
+              }"
+            >
+              {{ loanFeedback()?.message }}
+            </p>
+          }
+        </div>
+      </form>
+    </section>
+  </div>
+</main>

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { AccountsDashboardComponent } from './accounts-dashboard.component';
 import { AccountsService } from './accounts.service';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('AccountsDashboardComponent', () => {
   let fixture: ComponentFixture<AccountsDashboardComponent>;
@@ -35,8 +36,7 @@ describe('AccountsDashboardComponent', () => {
       getHealth: jest.fn(),
       getAccounts: jest.fn(),
       getAccount: jest.fn(),
-      createTransaction: jest.fn(),
-      generateAccounts: jest.fn()
+      createTransaction: jest.fn()
     } as jest.Mocked<AccountsService>;
 
     accountsService.getHealth.mockReturnValue(
@@ -62,15 +62,9 @@ describe('AccountsDashboardComponent', () => {
       })
     );
 
-    accountsService.generateAccounts.mockReturnValue(
-      of({
-        message: '3 accounts created successfully',
-        data: []
-      })
-    );
 
     await TestBed.configureTestingModule({
-      imports: [AccountsDashboardComponent],
+      imports: [AccountsDashboardComponent, RouterTestingModule],
       providers: [{ provide: AccountsService, useValue: accountsService }]
     }).compileComponents();
 
@@ -98,20 +92,6 @@ describe('AccountsDashboardComponent', () => {
       type: 'debit',
       amount: 250,
       label: 'Paiement resto'
-    });
-  });
-
-  it('should request account generation with provided payload', () => {
-    component.generateAccountsForm.patchValue({
-      count: 3,
-      userId: 7
-    });
-
-    component.generateAccounts();
-
-    expect(accountsService.generateAccounts).toHaveBeenCalledWith({
-      count: 3,
-      userId: 7
     });
   });
 });
