@@ -23,6 +23,7 @@
 - [x] Affichage détails (solde, devise)
 - [x] Afficher IBAN
 - [x] États loading/empty/error
+- [x] Génération comptes fictifs
 - [x] Responsive mobile/tablette
 - [ ] Rafraîchissement automatique
 - [ ] Animations Tailwind

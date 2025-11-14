@@ -3,6 +3,7 @@
 ## Implémentation actuelle
 - **Carte santé backend** : ping `/health`, affichage status + timestamp + bouton d'actualisation.
 - **Liste des comptes** : chargement via `/api/accounts`, sélection automatique du premier compte, états `chargement`, `erreur` et `vide`.
+- **Génération de comptes** : formulaire admin dans la sidebar pour déclencher `POST /api/bank/generate-accounts` (1 à 50 comptes).
 - **Détails du compte** : solde, devise, IBAN conditionnel, badge devise, rafraîchissement lors de la sélection.
 - **Transactions** : tableau trié par ordre d'arrivée, feedback lorsqu'il n'y a pas d'opérations.
 - **Formulaire de transaction** : Reactive Forms, validation min 0.01 €, reset après succès, messages inline (`success` / `error`).
