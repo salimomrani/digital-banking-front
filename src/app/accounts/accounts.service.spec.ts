@@ -4,7 +4,12 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 import { AccountsService } from './accounts.service';
-import { AccountResponse, AccountsResponse, TransactionResponse } from './accounts.types';
+import {
+  AccountResponse,
+  AccountsResponse,
+  GenerateAccountsResponse,
+  TransactionResponse
+} from './accounts.types';
 
 describe('AccountsService', () => {
   let service: AccountsService;
@@ -92,6 +97,22 @@ describe('AccountsService', () => {
     const req = httpMock.expectOne('http://localhost:4000/api/accounts/ACC-0002/transactions');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ type: 'credit', amount: 50, label: 'Test' });
+    req.flush(mockResponse);
+  });
+
+  it('should call the generate accounts endpoint', () => {
+    const mockResponse: GenerateAccountsResponse = {
+      message: '2 accounts created successfully',
+      data: []
+    };
+
+    service.generateAccounts({ count: 2 }).subscribe((response) => {
+      expect(response.message).toContain('2 accounts');
+    });
+
+    const req = httpMock.expectOne('http://localhost:4000/api/bank/generate-accounts');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ count: 2 });
     req.flush(mockResponse);
   });
 });

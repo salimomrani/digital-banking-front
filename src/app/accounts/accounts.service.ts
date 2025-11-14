@@ -6,6 +6,8 @@ import {
   AccountResponse,
   AccountsResponse,
   HealthStatus,
+  GenerateAccountsPayload,
+  GenerateAccountsResponse,
   NewTransactionPayload,
   TransactionResponse
 } from './accounts.types';
@@ -36,6 +38,13 @@ export class AccountsService {
   createTransaction(accountId: string, payload: NewTransactionPayload) {
     return this.http.post<TransactionResponse>(
       `${this.apiBaseUrl}/api/accounts/${accountId}/transactions`,
+      payload
+    );
+  }
+
+  generateAccounts(payload: GenerateAccountsPayload) {
+    return this.http.post<GenerateAccountsResponse>(
+      `${this.apiBaseUrl}/api/bank/generate-accounts`,
       payload
     );
   }

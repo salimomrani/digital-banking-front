@@ -35,7 +35,8 @@ describe('AccountsDashboardComponent', () => {
       getHealth: jest.fn(),
       getAccounts: jest.fn(),
       getAccount: jest.fn(),
-      createTransaction: jest.fn()
+      createTransaction: jest.fn(),
+      generateAccounts: jest.fn()
     } as jest.Mocked<AccountsService>;
 
     accountsService.getHealth.mockReturnValue(
@@ -58,6 +59,13 @@ describe('AccountsDashboardComponent', () => {
           label: 'Test',
           timestamp: '2024-01-02T00:00:00Z'
         }
+      })
+    );
+
+    accountsService.generateAccounts.mockReturnValue(
+      of({
+        message: '3 accounts created successfully',
+        data: []
       })
     );
 
@@ -90,6 +98,20 @@ describe('AccountsDashboardComponent', () => {
       type: 'debit',
       amount: 250,
       label: 'Paiement resto'
+    });
+  });
+
+  it('should request account generation with provided payload', () => {
+    component.generateAccountsForm.patchValue({
+      count: 3,
+      userId: 7
+    });
+
+    component.generateAccounts();
+
+    expect(accountsService.generateAccounts).toHaveBeenCalledWith({
+      count: 3,
+      userId: 7
     });
   });
 });

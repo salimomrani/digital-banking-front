@@ -41,6 +41,66 @@
         </button>
       </div>
 
+      <form
+        class="mb-4 space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-4"
+        [formGroup]="generateAccountsForm"
+        (ngSubmit)="generateAccounts()"
+      >
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm font-semibold text-slate-700">Générer des comptes fictifs</p>
+            <p class="text-xs text-slate-500">Entre 1 et 50 comptes par requête</p>
+          </div>
+          <button
+            type="submit"
+            class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="disableGenerateAccounts()"
+          >
+            @if (generatingAccounts()) {
+              <span>Generation...</span>
+            } @else {
+              <span>Générer</span>
+            }
+          </button>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Nombre de comptes
+            <input
+              type="number"
+              min="1"
+              max="50"
+              formControlName="count"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+          <label class="flex flex-col gap-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            ID utilisateur (optionnel)
+            <input
+              type="number"
+              min="1"
+              formControlName="userId"
+              placeholder="ex: 42"
+              class="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+          </label>
+        </div>
+        @if (generateAccountsForm.get('count')?.invalid && generateAccountsForm.get('count')?.touched) {
+          <p class="text-sm text-rose-600">Choisissez un nombre entre 1 et 50.</p>
+        }
+        @if (generationFeedback()) {
+          <p
+            class="text-sm font-medium"
+            [ngClass]="{
+              'text-emerald-600': generationFeedback()?.type === 'success',
+              'text-rose-600': generationFeedback()?.type === 'error'
+            }"
+          >
+            {{ generationFeedback()?.message }}
+          </p>
+        }
+      </form>
+
       @if (loadingAccounts()) {
         <div class="text-sm text-slate-500">Chargement des comptes...</div>
       }
