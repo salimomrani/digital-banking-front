@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Source lives under `src/`, with bootstrap files in `main.ts` and routing config in `src/app/app.routes.ts`. Feature work goes inside `src/app`, keeping smart containers near their templates (`.ts`, `.html`, `.css`). Global styles belong in `src/styles.css`, while static assets (icons, mock JSON) belong in `public/`. Tests should mirror code location via sibling `*.spec.ts` files to keep coverage aligned with features.
+Source lives under `src/`, with bootstrap files in `main.ts` and routing config in `src/app/app.routes.ts`. Feature work goes inside `src/app`, keeping smart containers near their templates (`.ts`, `.html`, `.scss`). Global styles belong in `src/styles.scss`, while static assets (icons, mock JSON) belong in `public/`. Tests should mirror code location via sibling `*.spec.ts` files to keep coverage aligned with features.
 
 ## Build, Test, and Development Commands
 - `npm start`: runs `ng serve` with live reload on `http://localhost:4200/`.
